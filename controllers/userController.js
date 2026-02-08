@@ -41,10 +41,3 @@ export function loginUser(req, res) {
     }
   });
 }
-
-git init
-git add .
-git commit -m "user login created"
-git branch -M main
-git remote add origin https://github.com/princenuwan/i-computers-backend-batch-nine.git
-git push -u origin main
