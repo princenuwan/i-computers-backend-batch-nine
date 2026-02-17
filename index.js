@@ -19,6 +19,14 @@ const app = express()
 //---MIDDLEWARE---//
 app.use(express.json())
 
+//---AUTHANTICATION AND AUTHARIZATION
+app.use(
+    (req, res, next)=>{
+        const header = req.header("Authorization")
+        console.log(header)
+        next()
+})
+
 
 //---IMPORTING ROUTERS---//
 app.use("/user", userRouter)

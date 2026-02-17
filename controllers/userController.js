@@ -1,6 +1,7 @@
 import e from "express";
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
+import Jwt from "jsonwebtoken";
 
 export function createUser(req, res) {
   let hashedPassword = bcrypt.hashSync(req.body.password, 10);
@@ -25,19 +26,57 @@ export function createUser(req, res) {
 }
 
 export function loginUser(req, res) {
-  //login logic will be here
-  console.log(req.body.email);
-
   User.findOne({
     email: req.body.email,
-  }).then((user) => {
-    if (user == null) {
-      res.json({
-        message: "user with given email not found",
-      })
-    } else {
-      const isPasswordValid = bcrypt.compareSync(req.body.password, user.password);
-      console.log(isPasswordValid);
-    }
-  });
+  })
+    .then((user) => {
+      if (user == null) {
+        res.json({
+          message: "user with given email not found",
+        });
+      } else {
+        const isPasswordValid = bcrypt.compareSync(
+          req.body.password,
+          user.password,
+        );
+
+        if (isPasswordValid) {
+          const token = Jwt.sign(
+            {
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              role: user.role,
+              image: user.image,
+              isEmailVerified: user.isEmailVerified,
+            },
+            "i-computers-54",
+          );
+
+          console.log(token);
+
+          console.log({
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+            image: user.image,
+            isEmailVerified: user.isEmailVerified,
+          });
+
+          res.json({
+            message: "Login successfull",
+          });
+        } else {
+          res.status(401).json({
+            message: "Login failed",
+          });
+        }
+      }
+    })
+    .catch(() => {
+      res.status(500).json({
+        message: "Internal Server error",
+      });
+    });
 }
